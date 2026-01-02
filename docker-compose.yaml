@@ -1,0 +1,39 @@
+services:
+  espocrm:
+    image: espocrm/espocrm:latest
+    ports:
+      - "8081:80"
+    environment:
+      ESPOCRM_DATABASE_HOST: db
+      ESPOCRM_DATABASE_NAME: espocrm
+      ESPOCRM_DATABASE_USER: espocrm
+      ESPOCRM_DATABASE_PASSWORD: strongpassword
+      ESPOCRM_SITE_URL: https://crm.yourdomain.com
+      TZ: Asia/Kolkata
+
+    volumes:
+      - espocrm_data:/var/www/html
+
+    depends_on:
+      - db
+
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.6
+    environment:
+      MYSQL_DATABASE: espocrm
+      MYSQL_USER: espocrm
+      MYSQL_PASSWORD: strongpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+      TZ: Asia/Kolkata
+
+    volumes:
+      - db_data:/var/lib/mysql
+
+    restart: unless-stopped
+
+volumes:
+  espocrm_data:
+  db_data:
+
