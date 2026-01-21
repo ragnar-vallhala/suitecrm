@@ -1,14 +1,13 @@
 services:
   espocrm:
     image: espocrm/espocrm:latest
-    ports:
-      - "8081:80"
+
     environment:
       ESPOCRM_DATABASE_HOST: db
       ESPOCRM_DATABASE_NAME: espocrm
       ESPOCRM_DATABASE_USER: espocrm
       ESPOCRM_DATABASE_PASSWORD: strongpassword
-      ESPOCRM_SITE_URL: https://crm.yourdomain.com
+      ESPOCRM_SITE_URL: https://crm.navrobotec.com
       TZ: Asia/Kolkata
 
     volumes:
@@ -17,6 +16,29 @@ services:
     depends_on:
       - db
 
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certs:/etc/nginx/certs
+    depends_on:
+      - espocrm
+      - backup-dashboard
+    restart: unless-stopped
+
+  backup-dashboard:
+    build: ./backup-dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./backups:/backups
+      - ./scripts:/scripts
+    ports:
+      - "3000:3000"
     restart: unless-stopped
 
   db:
@@ -36,4 +58,5 @@ services:
 volumes:
   espocrm_data:
   db_data:
+
 
