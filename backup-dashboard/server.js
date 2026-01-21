@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const cron = require('node-cron');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3030;
 const ESPO_URL = 'http://espocrm'; // Internal Docker URL
 const BACKUP_DIR = '/backups';
 const SCRIPTS_DIR = '/scripts';
