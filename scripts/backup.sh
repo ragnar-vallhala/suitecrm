@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 BACKUP_DIR="/backups"
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")
@@ -14,7 +14,7 @@ docker exec suitecrm-db-1 mysqldump -u espocrm -pstrongpassword espocrm > "$DB_B
 # Backup Data Volume
 # We use a helper container to mount the volume and tar it to the backup dir
 echo "Backing up data volume..."
-docker run --rm --volumes-from suitecrm-espocrm-1 -v "$BACKUP_DIR":/backup alpine tar czf "/backup/data_$TIMESTAMP.tar.gz" -C /var/www/html .
+docker run --rm --volumes-from suitecrm-espocrm-1 -v /root/suitecrm/backups:/backup alpine tar czf "/backup/data_$TIMESTAMP.tar.gz" -C /var/www/html .
 
 echo "Backup completed: $DB_BACKUP_FILE and $DATA_BACKUP_FILE"
 

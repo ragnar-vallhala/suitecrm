@@ -1,7 +1,6 @@
 services:
   espocrm:
     image: espocrm/espocrm:latest
-
     environment:
       ESPOCRM_DATABASE_HOST: db
       ESPOCRM_DATABASE_NAME: espocrm
@@ -9,26 +8,30 @@ services:
       ESPOCRM_DATABASE_PASSWORD: strongpassword
       ESPOCRM_SITE_URL: https://crm.navrobotec.com
       TZ: Asia/Kolkata
-
     volumes:
       - espocrm_data:/var/www/html
-
+    expose:
+      - "80"
     depends_on:
       - db
-
+    networks:
+      - crm_net
     restart: unless-stopped
 
   nginx:
     image: nginx:latest
-    ports:
-      - "80:80"
-      - "443:443"
+    expose:
+      - "80"
+      - "443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./certs:/etc/nginx/certs
     depends_on:
       - espocrm
       - backup-dashboard
+    networks:
+      - crm_net
+      - web_gateway
     restart: unless-stopped
 
   backup-dashboard:
@@ -39,6 +42,8 @@ services:
       - ./scripts:/scripts
     ports:
       - "3030:3030"
+    networks:
+      - crm_net
     restart: unless-stopped
 
   db:
@@ -49,10 +54,10 @@ services:
       MYSQL_PASSWORD: strongpassword
       MYSQL_ROOT_PASSWORD: rootpassword
       TZ: Asia/Kolkata
-
     volumes:
       - db_data:/var/lib/mysql
-
+    networks:
+      - crm_net
     restart: unless-stopped
 
 volumes:
@@ -60,3 +65,8 @@ volumes:
   db_data:
 
 
+networks:
+  crm_net:
+    driver: bridge
+  web_gateway:
+    external: true
